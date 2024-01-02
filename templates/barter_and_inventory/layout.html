@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static "img/favicon.png" %}">
+        <title>{% if page_title %} {{ page_title }} {% else %} Barter & Inventory Management {% endif %}</title>
+		<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap.min.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static "css/font-awesome.min.css" %}">
+        {% block page_css_before_app %}
+
+        {% endblock %}
+        <link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}">
+        {% block page_css_after_app %}
+
+        {% endblock %}
+		<!--[if lt IE 9]>
+			<script src="{% static "js/html5shiv.min.js" %}"></script>
+			<script src="{% static "js/respond.min.js" %}"></script>
+		<![endif]-->
+    </head>
+    <body>
+        <div class="main-wrapper">
+            {% include 'barter_and_inventory/inc/header.html' %}
+            {% include 'barter_and_inventory/inc/sidebar.html' %}
+            <div class="page-wrapper">
+                {% block content %}
+
+                {% endblock %}
+                {% include 'barter_and_inventory/inc/notification_box.html' %}
+            </div>
+        </div>
+		<div class="sidebar-overlay" data-reff="#sidebar"></div>
+        <script type="text/javascript" src="{% static "js/jquery-3.2.1.min.js" %}"></script>
+        <script type="text/javascript" src="{% static "js/bootstrap.min.js" %}"></script>
+        {% block page_js_before_app %}
+
+        {% endblock %}
+		<script type="text/javascript" src="{% static "js/app.js" %}"></script>
+        {% block page_js_after_app %}
+
+        {% endblock %}
+    </body>
+</html>

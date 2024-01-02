@@ -1,0 +1,337 @@
+{% extends 'barter_and_inventory/index-layout.html' %}
+{% load static %}
+{% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+    <style>
+        /* Add this style to adjust font size for small screens */
+        @media only screen and (max-width: 500px) {
+            .offer-footer-item strong {
+                font-size: 10px; /* Adjust the font size as needed */
+            }
+
+            .offer-footer-item span {
+                font-size: 10px; /* Adjust the font size as needed */
+            }
+        }
+    </style>
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="content container-fluid">
+        <div class="row">
+            <div class="col-xs-8">
+                <h4 class="page-title">Public Offers</h4>
+            </div>
+        </div>
+        <div class="row filter-row">
+           <form method="get" action="{% url 'barter_and_inventory:index' %}">
+                <div class="col-sm-3 col-md-2 col-xs-6">
+                    <div class="form-group form-focus select-focus">
+                        <label class="control-label">Category</label>
+                        <select class="select floating" name="category" id="category_filter_select">
+                            <option value="" > ---- Select ---- </option>
+                            {% for ctg in categories %}
+                                <option value="{{ ctg.pk }}" {% if category == ctg.pk %} selected {% endif %}>{{ ctg.category_title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-md-2 col-xs-6">
+                    <div class="form-group form-focus select-focus">
+                        <label class="control-label">Offer Status</label>
+                        <select class="select floating" name="offer_status" id="offer_status_filter_select">
+                            <option value="" > ---- Select ---- </option>
+                            <option value="OPEN" {% if offer_status == "OPEN" %} selected {% endif %} > Open </option>
+                            <option value="NEGOTIATION" {% if offer_status == "NEGOTIATION" %} selected {% endif %}> Negotiating </option>
+                        </select>
+                    </div>
+               </div>
+               <div class="col-sm-3 col-md-2 col-xs-6">
+                    <button type="submit" name="submit" class="btn btn-success btn-block"> Search </button>
+               </div>
+            </form>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                {% if offers.count > 0 %}
+                    {% for offer in offers %}
+                        <div class="card-box">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                                        <h3 class="card-title">
+                                            {{ offer.offer_title }}
+                                        </h3>
+                                        <h3 class="card-title">
+                                            Estimated Cost: <strong>{{ offer.estimated_cost }} {{ offer.estimated_cost_currency }}</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-2">
+                                    {% if offer.offered_products %}
+                                        <div class="thumbnail">
+                                            <div class="thumb">
+                                                {% if offer.offered_products.first %}
+                                                    {% if offer.offered_products.first.product %}
+                                                        {% if offer.offered_products.first.product.product_photos.first %}
+                                                            <img src="{{ offer.offered_products.first.product.product_photos.first.product_photo.url }}" class="img-responsive" alt="image" >
+                                                        {% else %}
+                                                            <img src="{% static "img/placeholder.png" %}" class="img-responsive" alt="image" >
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <img src="{% static "img/placeholder.png" %}" class="img-responsive" alt="image" >
+                                                    {% endif %}
+                                                {% else %}
+                                                    <img src="{% static "img/placeholder.png" %}" class="img-responsive" alt="image" >
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="thumbnail">
+                                            <div class="thumb">
+                                                <img src="{% static "img/placeholder.png" %}" class="img-responsive" alt="image" >
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-xs-12 col-sm-8" style="padding-top: 10px; padding-bottom: 10px;">
+                                    {{ offer.offer_description }}
+                                </div>
+                                <div class="col-xs-12 col-sm-2" style="padding-top: 10px; padding-bottom: 10px;">
+                                    {% if request.user.is_authenticated %}
+                                        {% if offer.already_placed_bid %}
+                                            <p>You've already placed a bid.</p>
+                                            <a href="{% url 'barter_and_inventory:view_offer_detail' offer.already_placed_bid %}" class="btn btn-info btn-block">View Your Bid</a>
+                                        {% else %}
+                                        <button href="{% url 'barter_and_inventory:view_exchangeable_offers' offer.pk %}" class="btn btn-success btn-block">Place Bid</button>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{% url 'barter_and_inventory:login' %}" class="btn btn-success btn-block">Place Bid</a>
+                                    {% endif %}
+                                </div>
+                                <div class="col-xs-12" style="padding-top: 10px; padding-bottom: 10px;">
+                                    <a class="btn btn-sm btn-info" style="margin-bottom: 20px;" onclick="toggleProductDetails('{{ offer.pk }}');">
+                                        Show Details
+                                    </a>
+                                </div>
+                                <div class="col-xs-12" style="padding-top: 10px; display: none; padding-bottom: 10px;" id="offer_products_details_{{ offer.pk }}">
+                                    <div class="row">
+                                        {% for item in offer.offered_products.all %}
+                                            <div class="col-xs-12">
+                                                <div class="card-box" style="border: 1px solid #ff9b44;">
+                                                    <div class="card-header" style="display: flex; flex-direction: row; justify-content: space-between;">
+                                                        <div><strong>{{ item.product.product_title }}</strong></div>
+                                                        <div style="float: right"><strong>Quantity: </strong>{{ item.product_quantity }}</div>
+                                                    </div>
+                                                    <div>
+                                                        <hr>
+                                                    </div>
+                                                    <div>
+                                                        <div class="row">
+                                                            <div class="col-xs-12">
+                                                                <p><strong>Description</strong></p>
+                                                                <p>{{ item.product.product_description }}</p>
+                                                            </div>
+                                                        </div>
+                                                        <p class=""><strong>Product Photos</strong></p>
+                                                        <div class="row">
+                                                            {% for pp in item.product.product_photos.all %}
+                                                                <div class="col-md-3 col-sm-6">
+                                                                    <div class="thumbnail">
+                                                                        <div class="thumb">
+                                                                            <img src="{{ pp.product_photo.url }}" class="img-responsive" alt="{{ pp.product_photo }}" >
+                                                                        </div>
+                                                                        <div class="caption text-center" style="overflow-wrap: break-word;">
+                                                                             {{ pp.product_photo }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                {% if forloop.counter|divisibleby:4 %}
+                                                                    </div>
+                                                                    <div class="row">
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <hr>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="offer-footer" style="display: flex; flex-direction: row; justify-content: space-evenly;">
+                                        <div class="offer-footer-item text-center" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                            <span>
+                                                <strong>Products Included</strong>
+                                            </span>
+                                            <span>
+                                                {{ offer.offered_products.count }}
+                                            </span>
+                                        </div>
+                                        <div class="offer-footer-separator text-center" style="display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #EEEEEE;">
+                                            <span>&nbsp;</span>
+                                            <span>&nbsp;</span>
+                                        </div>
+                                        {% if offer.includes_cash %}
+                                            <div class="offer-footer-item text-center" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                                <span>
+                                                    <strong>Cash in hand</strong>
+                                                </span>
+                                                <span>
+                                                    {{ offer.cash_in_hand }} {{ offer.cash_in_hand_currency }}
+                                                </span>
+                                            </div>
+                                            <div class="offer-footer-separator text-center" style="display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #EEEEEE;">
+                                                <span>&nbsp;</span>
+                                                <span>&nbsp;</span>
+                                            </div>
+                                        {% endif %}
+                                        <div class="offer-footer-item text-center" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                            <span>
+                                                <strong>Shipment Method</strong>
+                                            </span>
+                                            <span>
+                                                {{ offer.shipment_method|replace:'_| ' }}
+                                            </span>
+                                        </div>
+                                        <div class="offer-footer-separator text-center" style="display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #EEEEEE;">
+                                            <span>&nbsp;</span>
+                                            <span>&nbsp;</span>
+                                        </div>
+                                        <div class="offer-footer-item text-center" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                            <span>
+                                                <strong>Total Bids</strong>
+                                            </span>
+                                            <span>
+                                                {{ offer.against_offer.count }}
+                                            </span>
+                                        </div>
+                                        <div class="offer-footer-separator text-center" style="display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #EEEEEE;">
+                                            <span>&nbsp;</span>
+                                            <span>&nbsp;</span>
+                                        </div>
+                                        <div class="offer-footer-item text-center" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                            <span>
+                                                <strong>Created By</strong>
+                                            </span>
+                                            <span>
+                                                {{ offer.created_by.get_full_name }}
+                                            </span>
+                                        </div>
+                                        <div class="offer-footer-separator text-center" style="display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #EEEEEE;">
+                                            <span>&nbsp;</span>
+                                            <span>&nbsp;</span>
+                                        </div>
+                                        <div class="offer-footer-item text-center" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                            <span>
+                                                <strong>Offer Status</strong>
+                                            </span>
+                                            <span>
+                                                {% if offer.offer_status == "OPEN" %}
+                                                    <span class="label label-success-border">{{ offer.offer_status }}</span>
+                                                {% elif offer.offer_status == "NEGOTIATING" %}
+                                                    <span class="label label-info-border">{{ offer.offer_status }}</span>
+                                                {% else %}
+                                                    <span class="label label-danger-border">{{ offer.offer_status }}</span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="offer-footer-separator text-center" style="display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #EEEEEE;">
+                                            <span>&nbsp;</span>
+                                            <span>&nbsp;</span>
+                                        </div>
+                                        <div class="offer-footer-item text-center" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                            <span>
+                                                <strong>Created Date</strong>
+                                            </span>
+                                            <span>
+                                                {{ offer.created_at|date:'d/m/Y' }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                {% else  %}
+
+                    <h2 class="text-center " style="margin-top: 100px; color: #bdbdbd;">No Offers Available.</h2>
+                {% endif %}
+            </div>
+            <div class="col-md-12">
+                {% if is_paginated %}
+                    <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <span><a href="?{% url_replace page=page_obj.previous_page_number %}">Previous</a></span>
+
+                        </li>
+                    {% endif %}
+                        <li class="">
+                            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+                        </li>
+                    {% if page_obj.has_next %}
+                        <li>
+                            <span><a href="?{% url_replace page=page_obj.next_page_number %}">Next</a></span>
+                        </li>
+                    {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div id="fm-modal-grid" class="modal custom-modal fade" role="dialog">
+        <div class="modal-dialog">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <div class="modal-content modal-lg" id="offer_delete_modal_content">
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+<script>
+$(function (){
+    {% if offer_status %}
+        $("#offer_status_filter_select").val("{{ offer_status }}").trigger('change')
+    {% endif %}
+    {% if category %}
+        $("#category_filter_select").val("{{ category }}").trigger('change')
+    {% endif %}
+});
+function paceBidOnOffer(url){
+    let uri = "{{ request.scheme }}://{{ request.META.HTTP_HOST }}"+url;
+    $("#fm-modal-grid").modal("show");
+    let product_delete_modal = document.getElementById('offer_delete_modal_content');
+    $.get(uri, (response)=>{
+        product_delete_modal.innerHTML = response
+    });
+}
+function selectProductToBid(id){
+    $("div[id^='offer_card_']").css('background', '#fff');
+    let offer_card = $('#offer_card_'+id);
+    console.log("offer_card", offer_card)
+    offer_card.css({background: 'linear-gradient(to right, #ff9b44 0%, #fc6075 100%)'});
+    $('#id_offer').val(id);
+}
+function toggleProductDetails(product_id){
+    $("#offer_products_details_"+product_id).toggle();
+}
+</script>
+{% endblock %}

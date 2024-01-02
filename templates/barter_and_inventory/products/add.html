@@ -1,0 +1,162 @@
+{% extends 'barter_and_inventory/layout.html' %}
+{% load static %}
+{% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/image-hover.css" %}">
+{% endblock %}
+
+{% block content %}
+    <div class="content container-fluid">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                {% if is_edit %}
+                    <form method="post" action="{% url 'barter_and_inventory:edit_product' form.instance.pk %}" enctype="multipart/form-data">
+                {% else %}
+                    <form method="post" action="{% url 'barter_and_inventory:add_product' %}" enctype="multipart/form-data">
+                {% endif %}
+                    {% csrf_token %}
+                    <h3 class="page-title">Add Product</h3>
+                    {% if form.errors %}
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    {{ error|escape }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>{{ form.product_title.label}} <span class="text-danger">*</span></label>
+                                {{ form.product_title }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>{{ form.product_description.label}}</label>
+                                {{ form.product_description }}
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>{{ form.product_quantity.label }}</label>
+                                {{ form.product_quantity }}
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>{{ form.product_condition.label }}</label>
+                                {{ form.product_condition }}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                 <label>{{ form.price_per_unit.label }}</label>
+                                {{ form.price_per_unit }}
+                            </div>
+                            <div class="form-group">
+                                 <label>{{ form.price_currency.label }}</label>
+                                {{ form.price_currency }}
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <label>{{ form.product_categories.label }}</label>
+                                {{ form.product_categories }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label>{{ form.product_photos.label }}</label>
+                                {{ form.product_photos }}
+                        </div>
+
+                    </div>
+                    {% if is_edit %}
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label style="margin-top: 20px;">Uploaded Photos</label><br/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            {% for item in form.instance.product_photos.all %}
+                                <div class="col-sm-3">
+                                    <div class="well image-well">
+                                        <div class="product-image-card">
+                                            <img style="width: 100%; height: auto" src="{{ item.product_photo.url }}" alt="{{ item.product_photo.filename }}" class="product-image" />
+                                            <div class="product-image-overlay">
+                                                <div class="image-cta">
+                                                    <button class="btn btn-primary" type="button">
+                                                        <i class="fa fa-eye" aria-hidden="true"></i>View
+                                                    </button>
+                                                    <button class="btn btn-danger" type="button" onclick="javascript:deleteProductPhoto('{% url 'barter_and_inventory:delete_product_photo' item.pk %}')" >
+                                                        <i class="fa fa-trash-o"  aria-hidden="true"></i>Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if forloop.counter|divisibleby:4 %}
+                                    </div>
+                                    <div class="row">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-sm-12 text-center m-t-20">
+                            <button type="submit" class="btn btn-primary">
+                                {% if is_edit %}
+                                    Update Product
+                                {% else %}
+                                    Add Product
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="fm-modal-grid" tabindex="-1" role="dialog" aria-labelledBy="fm-modal-grid" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" id="product_delete_modal_content">
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+<script >
+    function deleteProductPhoto(url){
+        console.log("clicked delete view");
+        let uri = "{{ request.scheme }}://{{ request.META.HTTP_HOST }}"+url;
+        $("#fm-modal-grid").modal("show");
+        let product_delete_modal = document.getElementById('product_delete_modal_content');
+        $.get(uri, (response)=>{
+            product_delete_modal.innerHTML = response
+        });
+    }
+</script>
+{% endblock %}

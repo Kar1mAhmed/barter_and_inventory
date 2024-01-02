@@ -1,0 +1,35 @@
+{% extends 'barter_and_inventory/account_base.html' %}
+{% load static %}
+{% block page_css_before_app %}
+
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="account-page">
+        <div class="container">
+            <h3 class="account-title">Signup Failed!</h3>
+            <div class="account-box">
+                <div class="account-wrapper">
+                    <div class="account-logo">
+                        <a href="/"><img src="{% static "img/logo2.png" %}" alt="Focus Technologies"></a>
+                    </div>
+                    <div class="alert alert-danger">
+                        Account activate failed. Please contact admin.
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js_before_app %}
+
+{% endblock %}
+
+{% block page_js_after_app %}
+
+{% endblock %}

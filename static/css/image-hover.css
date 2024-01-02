@@ -1,0 +1,46 @@
+.image-well {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  /* width: 50%; */
+}
+
+.product-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.product-image-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: .5s ease;
+  background-color: black;
+}
+
+.product-image-card:hover .product-image-overlay {
+  opacity: 0.9;
+}
+
+.image-cta {
+  color: black;
+  font-size: 15px;
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.image-cta button i {
+  padding-right: 6px;
+}

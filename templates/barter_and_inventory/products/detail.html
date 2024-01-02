@@ -1,0 +1,238 @@
+{% extends 'barter_and_inventory/layout.html' %}
+{% load static %}
+{% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap-datetimepicker.min.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+{% block content %}
+    <div class="content container-fluid">
+        <div class="row">
+            <div class="col-xs-8">
+                <h4 class="page-title">{{ object.product_title }}</h4>
+            </div>
+            <div class="col-sm-4 text-right m-b-30">
+                <a href="{% url 'barter_and_inventory:edit_product' object.pk %}" class="btn btn-primary rounded" ><i class="fa fa-plus"></i> Edit Product</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="panel">
+                    <div class="panel-body">
+                        <div class="project-title">
+                            <h5 class="panel-title">{{ object.product_title }}</h5>
+                            <small class="block text-ellipsis m-b-15"><span class="text-xs">2</span> <span class="text-muted">open tasks, </span><span class="text-xs">5</span> <span class="text-muted">tasks completed</span></small>
+                        </div>
+                        <p>{{ object.product_description }}</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-body">
+                        <h5 class="panel-title m-b-20">Uploaded image files</h5>
+                        <div class="row">
+                            {% for item in object.product_photos.all %}
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="thumbnail">
+                                        <div class="thumb">
+                                            <img src="{{ item.product_photo.url }}" class="img-responsive" alt="{{ item.product_photo }}" >
+                                        </div>
+                                        <div class="caption text-center" style="overflow-wrap: break-word;">
+                                             {{ item.product }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if forloop.counter|divisibleby:4 %}
+                                    </div>
+                                    <div class="row">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-body">
+                        <h5 class="panel-title m-b-20">Included In Offers</h5>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="table-responsive">
+                                    <table class="table table-striped custom-table m-b-0 datatable">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Estimated Cost</th>
+                                                <th class="text-center">Included Cash</th>
+                                                <th>Created Date</th>
+                                                <th>Last Update</th>
+                                                <th class="text-center">Status</th>
+                                                <th>Total Bids</th>
+                                                <th>Exchanged With</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for product_offer in object.product_offer.all %}
+                                                <tr>
+                                                    <td>
+                                                        <h2>
+                                                            <a href="{% url 'barter_and_inventory:view_offer_detail' product_offer.offer.pk %}">
+                                                            {{ product_offer.offer.offer_title}}
+                                                            <span>
+                                                                {{ product_offer.offer.offered_products.count }} Products Included
+                                                            </span>
+                                                        </a></h2>
+                                                    </td>
+                                                    <td>
+                                                        <h2><a href="#">{{ product_offer.offer.estimated_cost}}
+                                                            <span>{{ product_offer.offer.estimated_cost_currency }}</span>
+                                                        </a></h2>
+                                                    </td>
+                                                    <td>
+                                                        <h2>
+                                                            {% if product_offer.offer.includes_cash %}
+                                                                <a href="#">{{ product_offer.offer.cash_in_hand}}
+                                                                    <span>{{ product_offer.offer.cash_in_hand_currency }}</span>
+                                                                </a>
+                                                            {% else %}
+                                                                N/A
+                                                            {% endif %}
+                                                        </h2>
+                                                    </td>
+                                                    <td>{{ product_offer.offer.created_at }}</td>
+                                                    <td>{{ product_offer.offer.updated_at}}</td>
+                                                    <td class="text-center">
+                                                        {% if product_offer.offer.offer_status == "OPEN" %}
+                                                            <span class="label label-success-border">{{ product_offer.offer.offer_status }}</span>
+                                                        {% elif product_offer.offer.offer_status == "NEGOTIATING" %}
+                                                            <span class="label label-info-border">{{ product_offer.offer.offer_status }}</span>
+                                                        {% else %}
+                                                            <span class="label label-danger-border">{{ product_offer.offer.offer_status }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {{ product_offer.offer.bid_offer.count }}
+                                                    </td>
+                                                    <td>
+                                                        {% if product_offer.offer.exchanged_with %}
+                                                            <h2>
+                                                                <a href="{% url 'barter_and_inventory:view_offer_detail' product_offer.offer.exchanged_with_id %}">
+                                                                    {{ product_offer.offer.exchanged_with.offer_title}}
+                                                                    <span>{{ product_offer.offer.exchanged_with.exchange_date }}</span>
+                                                                </a>
+                                                            </h2>
+                                                        {% else %}
+                                                            N/A
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-3">
+                <div class="dash-widget clearfix card-box">
+                    <span class="dash-widget-icon"><i class="fa fa-usd" aria-hidden="true"></i></span>
+                    <div class="dash-widget-info">
+                        <h3>{% widthratio object.price_per_unit 1 object.product_quantity %}</h3>
+                        <span style="font-size: 13px">Total Worth (Products X Quantity)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="panel">
+                    <div class="panel-body">
+                        <h6 class="panel-title m-b-15">Product details</h6>
+                        <table class="table table-striped table-border">
+                            <tbody>
+                                <tr>
+                                    <td>Price Per Unit:</td>
+                                    <td class="text-right">{{ object.price_per_unit }} {{ object.price_currency }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Quantity:</td>
+                                    <td class="text-right">{{ object.product_quantity }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Created:</td>
+                                    <td class="text-right">{{ object.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Last Update:</td>
+                                    <td class="text-right">{{ object.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Condition:</td>
+                                    <td class="text-right">
+                                        <a class="btn btn-white btn-sm rounded dropdown-toggle"  aria-expanded="false">
+                                            {% if object.product_condition == 'NEW' %}
+                                                <i class="fa fa-dot-circle-o text-success"></i>
+                                            {% else %}
+                                                <i class="fa fa-dot-circle-o text-info"></i>
+                                            {% endif %} {{ object.product_condition }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Created by:</td>
+                                    <td class="text-right"><a href="#">{{ object.created_by.get_full_name }}</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Status:</td>
+                                    <td class="text-right">
+                                        {% if product.product_status == "AVAILABLE" %}
+                                            <span class="label label-success-border">{{ product.product_status }}</span>
+                                        {% else %}
+                                            <span class="label label-warning-border">{{ product.product_status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js_before_app %}
+     <script type="text/javascript" src="{% static "js/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/dataTables.bootstrap.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/moment.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/bootstrap-datetimepicker.min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+<script type="text/template" id="task-template">
+    <li class="task">
+        <div class="task-container">
+            <span class="task-action-btn task-check">
+                <span class="action-circle large complete-btn" title="Mark Complete">
+                    <i class="material-icons">check</i>
+                </span>
+            </span>
+            <span class="task-label" contenteditable="true"></span>
+            <span class="task-action-btn task-btn-right">
+                <span class="action-circle large" title="Assign">
+                    <i class="material-icons">person_add</i>
+                </span>
+                <span class="action-circle large delete-btn" title="Delete Task">
+                    <i class="material-icons">delete</i>
+                </span>
+            </span>
+        </div>
+    </li>
+</script>
+<script type="text/javascript" src="{% static "js/task.js" %}" ></script>
+{% endblock %}

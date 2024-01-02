@@ -1,0 +1,211 @@
+{% extends 'barter_and_inventory/layout.html' %}
+{% load static %}
+{% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+	<link rel="stylesheet" type="text/css" href="{% static "css/dataTables.bootstrap.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap-datetimepicker.min.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="content container-fluid">
+        <div class="row">
+            <div class="col-xs-8">
+                <h4 class="page-title">Offers</h4>
+            </div>
+            <div class="col-xs-4 text-right m-b-30">
+                <a href="{% url 'barter_and_inventory:add_offer' %}" class="btn btn-primary rounded pull-right" ><i class="fa fa-plus"></i> Add Offer</a>
+            </div>
+        </div>
+        <div class="row filter-row">
+               <form method="get" action="{% url 'barter_and_inventory:view_offers' %}" >
+               <div class="col-sm-2 col-md-3 col-xs-6">
+                    <div class="form-group form-focus">
+                        <label class="control-label">Offer Title</label>
+                        {% if offer_title %}
+                            <input type="text" value="{{ offer_title }}" name="offer_title" class="form-control floating" />
+                        {% else %}
+                            <input type="text" value="" name="offer_title" class="form-control floating" />
+                        {% endif %}
+                    </div>
+               </div>
+               <div class="col-sm-2 col-md-3 col-xs-6">
+                    <div class="form-group form-focus select-focus">
+                        <label class="control-label">Category</label>
+                        <select class="select floating" id="category_select" name="category">
+                            <option value=""> -- Select -- </option>
+                            {% for ctg in categories %}
+                                <option value="{{ ctg.pk }}" {% if category == ctg.pk %} selected {% endif %}>{{ ctg.category_title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+               </div>
+               <div class="col-sm-3 col-md-2 col-xs-6">
+                    <div class="form-group form-focus">
+                        <label class="control-label">From</label>
+                        <div class="cal-icon">
+                            {% if created_date_from %}
+                                <input class="form-control floating datetimepicker" id="created_date_from" name="created_date_from" type="text" value="{{ created_date_from|date:"Y/m/d" }}">
+                            {% else %}
+                                <input class="form-control floating datetimepicker" name="created_date_from"  type="text" value="">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+               <div class="col-sm-3 col-md-2 col-xs-6">
+                    <div class="form-group form-focus">
+                        <label class="control-label">To</label>
+                        <div class="cal-icon">
+                            {% if created_date_to %}
+                                <input class="form-control floating datetimepicker" id="created_date_to" name="created_date_to" type="text" value="{{ created_date_to|date:"Y/m/d" }}">
+                            {% else %}
+                                <input class="form-control floating datetimepicker" name="created_date_to" type="text" value="">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+               <div class="col-sm-3 col-md-2 col-xs-6">
+                    <button type="submit" class="btn btn-success btn-block"> Search </button>
+               </div>
+            </form>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-striped custom-table m-b-0 datatable">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Estimated Cost</th>
+                                <th class="text-center">Included Cash</th>
+                                <th>Created Date</th>
+                                <th>Last Update</th>
+                                <th class="text-center">Status</th>
+                                <th>Total Bids</th>
+                                <th>Exchanged With</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offer in offers %}
+                                <tr>
+                                    <td>
+                                        <h2>
+                                            <a href="{% url 'barter_and_inventory:view_offer_detail' offer.pk %}">
+                                            {{ offer.offer_title}}
+                                            <span>
+                                                {{ offer.offered_products.count }} Products Included
+                                            </span>
+                                        </a></h2>
+                                    </td>
+                                    <td>
+                                        <h2><a href="#">{{ offer.estimated_cost}}
+                                            <span>{{ offer.estimated_cost_currency }}</span>
+                                        </a></h2>
+                                    </td>
+                                    <td>
+                                        <h2>
+                                            {% if offer.includes_cash %}
+                                                <a href="#">{{ offer.cash_in_hand}}
+                                                    <span>{{ offer.cash_in_hand_currency }}</span>
+                                                </a>
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </h2>
+                                    </td>
+                                    <td>{{ offer.created_at }}</td>
+                                    <td>{{ offer.updated_at}}</td>
+                                    <td class="text-center">
+                                        {% if offer.offer_status == "OPEN" %}
+                                            <span class="label label-success-border">{{ offer.offer_status }}</span>
+                                        {% elif offer.offer_status == "NEGOTIATING" %}
+                                            <span class="label label-info-border">{{ offer.offer_status }}</span>
+                                        {% else %}
+                                            <span class="label label-danger-border">{{ offer.offer_status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ offer.bid_offer.count }}
+                                    </td>
+                                    <td>
+                                        {% if offer.exchanged_with %}
+                                            <h2>
+                                                <a href="{% url 'barter_and_inventory:view_offer_detail' offer.exchanged_with_id %}">
+                                                    {{ offer.exchanged_with.offer_title}}
+                                                    <span>{{ offer.exchanged_with.exchange_date }}</span>
+                                                </a>
+                                            </h2>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-right">
+                                        {% if offer.offer_status == "OPEN" or offer.offer_status == "NEGOTIATION" %}
+                                        <a onclick="javascript:deleteOffer('{% url 'barter_and_inventory:delete_offer' offer.pk %}')" title="Delete" class="btn btn-danger"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fm-modal-grid" class="modal custom-modal fade" role="dialog">
+        <div class="modal-dialog">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <div class="modal-content modal-lg" id="offer_delete_modal_content">
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/dataTables.bootstrap.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/moment.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/bootstrap-datetimepicker.min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+<script>
+$(function (){
+    {% if category %}
+        $("#category_select").val("{{ category }}").trigger('change')
+    {% endif %}
+    {% if created_date_from %}
+        let dt_element = $('#created_date_from');
+        dt_element.datetimepicker({
+            format: 'DD/MM/YYYY',
+            defaultDate: new Date(Date.parse("{{ created_date_from|date:"Y-m-d" }}"))
+        });
+    {% endif %}
+    {% if created_date_to %}
+        let dt_element2 = $('#created_date_to');
+        dt_element2.datetimepicker({
+            format: 'DD/MM/YYYY',
+            defaultDate: new Date(Date.parse("{{ created_date_to|date:"Y-m-d" }}"))
+        });
+    {% endif %}
+});
+function deleteOffer(url){
+    let uri = "{{ request.scheme }}://{{ request.META.HTTP_HOST }}"+url;
+    $("#fm-modal-grid").modal("show");
+    let product_delete_modal = document.getElementById('offer_delete_modal_content');
+    $.get(uri, (response)=>{
+        product_delete_modal.innerHTML = response
+    });
+}
+</script>
+{% endblock %}

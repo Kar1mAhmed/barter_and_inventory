@@ -1,0 +1,92 @@
+{% extends 'barter_and_inventory/account_base.html' %}
+{% load static %}
+{% block page_css_before_app %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap-datetimepicker.min.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="account-page">
+        <div class="container">
+            <h3 class="account-title">Bart & Inventory Signup</h3>
+            <div class="account-box">
+                <div class="account-wrapper">
+                    <div class="account-logo">
+                        <a href="/"><img src="{% static "img/logo2.png" %}" alt="Focus Technologies"></a>
+                    </div>
+                    <form action="{% url 'barter_and_inventory:signup' %}" method="post">
+                        {% csrf_token %}
+                        {% if form.errors %}
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        {{ error|escape }}
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ error|escape }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-group form-focus">
+                            <label class="control-label">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="form-group form-focus">
+                            <label class="control-label">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="form-group form-focus">
+                            <label class="control-label">{{ form.username.label }}</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="form-group form-focus">
+                            <label class="control-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="form-group form-focus">
+                            <label class="control-label">{{ form.birth_date.label }}</label>
+                            {{ form.birth_date }}
+                        </div>
+                        <div class="form-group form-focus">
+                            <label class="control-label">{{ form.password1.label }}</label>
+                            {{ form.password1 }}
+                        </div>
+                        <div class="form-group form-focus">
+                            <label class="control-label">{{ form.password2.label }}</label>
+                            {{ form.password2 }}
+                        </div>
+                        <div class="form-group text-center">
+                            <button class="btn btn-primary btn-block account-btn" type="submit">Register</button>
+                        </div>
+                        <hr>
+                        <div class="text-center">
+                            <a href="{% url 'barter_and_inventory:login' %}">Already have an account? Login</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/moment.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/bootstrap-datetimepicker.min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+    <script>
+        $(function (){
+            $('#id_birth_date').datetimepicker({
+                formate: "DD/MM/YYYY"
+            })
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'barter_and_inventory/layout.html' %}
+{% load static %}
+{% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+<link rel="stylesheet" type="text/css" href="{% static "plugins/morris/morris.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="content container-fluid">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-lg-3">
+                <div class="dash-widget clearfix card-box">
+                    <span class="dash-widget-icon"><i class="fa fa-cubes" aria-hidden="true"></i></span>
+                    <div class="dash-widget-info">
+                        <h3>{{ total_products }}</h3>
+                        <span>Products</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 col-lg-3">
+                <div class="dash-widget clearfix card-box">
+                    <span class="dash-widget-icon"><i class="fa fa-usd" aria-hidden="true"></i></span>
+                    <div class="dash-widget-info">
+                        <h3>{{total_offers}}</h3>
+                        <span>Offers</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 col-lg-3">
+                <div class="dash-widget clearfix card-box">
+                    <span class="dash-widget-icon"><i class="fa fa-diamond"></i></span>
+                    <div class="dash-widget-info">
+                        <h3>{{ total_bids_placed_placed }}</h3>
+                        <span>Bids Placed</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 col-lg-3">
+                <div class="dash-widget clearfix card-box">
+                    <span class="dash-widget-icon"><i class="fa fa-user" aria-hidden="true"></i></span>
+                    <div class="dash-widget-info">
+                        <h3>{{ total_bids_placed_received }}</h3>
+                        <span>Bids Received</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-sm-6 text-center">
+                        <div class="card-box">
+                            <div class="card-title">
+                                Products History By Month
+                            </div>
+                            <div id="area-chart" ></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 text-center">
+                        <div class="card-box">
+                            <div class="card-title">
+                                Offers History By Month
+                            </div>
+                            <div id="line-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "plugins/morris/morris.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "plugins/raphael/raphael-min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+    <script>
+        let data = [
+            { y: 'Jan', a: 0, b: 0},
+            { y: 'Feb', a: 0,  b: 0},
+            { y: 'Mar', a: 0,  b: 0},
+            { y: 'Apr', a: 0,  b: 0},
+            { y: 'May', a: 0,  b: 0},
+            { y: 'Jun', a: 0,  b: 0},
+            { y: 'Jul', a: 0, b: 0},
+            { y: 'Aug', a: 0, b: 0},
+            { y: 'Sep', a: 0, b: 0},
+            { y: 'Oct', a: 0, b: 0},
+            { y: 'Nov', a: 0, b: 0},
+            { y: 'Dec', a: 0, b: 0},
+        ]
+        {% for item in products_this_year %}
+            data[{{ forloop.counter0 }}].a = {{ item.products }}
+        {% endfor %}
+        {% for item in products_previous_year %}
+            data[{{ forloop.counter0 }}].b = {{ item.products }}
+        {% endfor %}
+        config = {
+            data: data,
+            xkey: 'y',
+            ykeys: ['a', 'b'],
+            labels: ['This Year','Previous Year'],
+            fillOpacity: 0.7,
+            hideHover: 'auto',
+            parseTime:false,
+            behaveLikeLine: true,
+            resize: true,
+            pointFillColors:['#ffffff'],
+            pointStrokeColors: ['black'],
+            gridLineColor: '#eef0f2',
+            lineColors:['orange','gray']
+        };
+        config.element = 'area-chart';
+        Morris.Area(config);
+        {% for item in offers_this_year %}
+            data[{{ forloop.counter0 }}].a = {{ item.offers }}
+        {% endfor %}
+        {% for item in offers_previous_year %}
+            data[{{ forloop.counter0 }}].b = {{ item.products }}
+        {% endfor %}
+        config.data = data
+        config.element = 'line-chart';
+        Morris.Line(config);
+    </script>
+{% endblock %}

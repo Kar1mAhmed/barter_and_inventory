@@ -1,0 +1,203 @@
+{% extends 'barter_and_inventory/layout.html' %}
+{% load static %}
+{% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+	<link rel="stylesheet" type="text/css" href="{% static "css/dataTables.bootstrap.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap-datetimepicker.min.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="content container-fluid">
+        <div class="row">
+            <div class="col-xs-8">
+                <h4 class="page-title">Products</h4>
+            </div>
+            <div class="col-xs-4 text-right m-b-30">
+                <a href="{% url 'barter_and_inventory:add_product' %}" class="btn btn-primary rounded pull-right" ><i class="fa fa-plus"></i> Add Product</a>
+            </div>
+        </div>
+        <div class="row filter-row">
+            <form method="get" action="{% url 'barter_and_inventory:view_products' %}" >
+               <div class="col-sm-2 col-md-3 col-xs-6">
+                    <div class="form-group form-focus">
+                        <label class="control-label">Product Title</label>
+                        {% if product_title %}
+                            <input type="text" value="{{ product_title }}" name="product_title" class="form-control floating" />
+                        {% else %}
+                            <input type="text" value="" name="product_title" class="form-control floating" />
+                        {% endif %}
+                    </div>
+               </div>
+               <div class="col-sm-2 col-md-3 col-xs-6">
+                    <div class="form-group form-focus select-focus">
+                        <label class="control-label">Category</label>
+                        <select class="select floating" id="category_select" name="category">
+                            <option value=""> -- Select -- </option>
+                            {% for ctg in categories %}
+                                <option value="{{ ctg.pk }}" {% if category == ctg.pk %} selected {% endif %}>{{ ctg.category_title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+               </div>
+               <div class="col-sm-3 col-md-2 col-xs-6">
+                    <div class="form-group form-focus">
+                        <label class="control-label">From</label>
+                        <div class="cal-icon">
+                            {% if created_date_from %}
+                                <input class="form-control floating datetimepicker" id="created_date_from" name="created_date_from" type="text" value="{{ created_date_from|date:"Y/m/d" }}">
+                            {% else %}
+                                <input class="form-control floating datetimepicker" name="created_date_from"  type="text" value="">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+               <div class="col-sm-3 col-md-2 col-xs-6">
+                    <div class="form-group form-focus">
+                        <label class="control-label">To</label>
+                        <div class="cal-icon">
+                            {% if created_date_to %}
+                                <input class="form-control floating datetimepicker" id="created_date_to" name="created_date_to" type="text" value="{{ created_date_to|date:"Y/m/d" }}">
+                            {% else %}
+                                <input class="form-control floating datetimepicker" name="created_date_to" type="text" value="">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+               <div class="col-sm-3 col-md-2 col-xs-6">
+                    <button type="submit" class="btn btn-success btn-block"> Search </button>
+               </div>
+            </form>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-striped custom-table m-b-0 datatable">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Quantity</th>
+                                <th>Price Per Unit</th>
+                                <th class="text-center">Condition</th>
+                                <th>Created Date</th>
+                                <th>Last Update</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                                <tr>
+                                    <td>
+                                        {% if product.product_photos.first %}
+                                            <a class="avatar" >
+                                                <img src="{{ request.scheme }}://{{ request.get_host }}{{ product.product_photos.first.product_photo.url }}" alt="{{ product.product_title }}">
+                                            </a>
+                                        {% endif %}
+                                        <h2><a href="{% url 'barter_and_inventory:view_product_detail' product.pk %}">
+                                            {{ product.product_title}}
+                                            <span>
+                                                {% for item in product.product_categories.all %}
+                                                    {{ item }},
+                                                {% endfor %}
+                                            </span>
+                                        </a></h2>
+                                    </td>
+                                    <td>{{ product.product_quantity }}</td>
+                                    <td>
+                                        <h2><a href="#">{{ product.price_per_unit}}
+                                            <span>{{ product.price_currency }}</span>
+                                        </a></h2>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="dropdown action-label">
+                                            <a class="btn btn-white btn-sm rounded dropdown-toggle"  aria-expanded="false">
+                                                {% if product.product_condition == 'NEW' %}
+                                                    <i class="fa fa-dot-circle-o text-success"></i>
+                                                {% else %}
+                                                    <i class="fa fa-dot-circle-o text-info"></i>
+                                                {% endif %} {{ product.product_condition }}
+                                            </a>
+
+                                        </div>
+                                    </td>
+                                    <td>{{ product.created_at }}</td>
+                                    <td>{{ product.updated_at}}</td>
+                                    <td>
+                                        {% if product.product_status == "AVAILABLE" %}
+                                            <span class="label label-success-border">{{ product.product_status }}</span>
+                                        {% else %}
+                                            <span class="label label-warning-border">{{ product.product_status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="dropdown">
+                                            <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
+                                            <ul class="dropdown-menu pull-right">
+                                                <li><a href="{% url 'barter_and_inventory:edit_product' product.pk %}" title="Edit" ><i class="fa fa-pencil m-r-5"></i> Edit</a></li>
+                                                <li><a onclick="javascript:deleteProduct('{% url 'barter_and_inventory:delete_product' product.pk %}')" title="Delete" ><i class="fa fa-trash-o m-r-5"></i> Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fm-modal-grid" class="modal custom-modal fade" role="dialog">
+        <div class="modal-dialog">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <div class="modal-content modal-lg" id="product_delete_modal_content">
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/dataTables.bootstrap.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/moment.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/bootstrap-datetimepicker.min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+<script>
+$(function (){
+    {% if category %}
+        $("#category_select").val("{{ category }}").trigger('change')
+    {% endif %}
+    {% if created_date_from %}
+        let dt_element = $('#created_date_from');
+        dt_element.datetimepicker({
+            format: 'DD/MM/YYYY',
+            defaultDate: new Date(Date.parse("{{ created_date_from|date:"Y-m-d" }}"))
+        });
+    {% endif %}
+    {% if created_date_to %}
+        let dt_element2 = $('#created_date_to');
+        dt_element2.datetimepicker({
+            format: 'DD/MM/YYYY',
+            defaultDate: new Date(Date.parse("{{ created_date_to|date:"Y-m-d" }}"))
+        });
+    {% endif %}
+});
+function deleteProduct(url){
+    let uri = "{{ request.scheme }}://{{ request.META.HTTP_HOST }}"+url;
+    $("#fm-modal-grid").modal("show");
+    let product_delete_modal = document.getElementById('product_delete_modal_content');
+    $.get(uri, (response)=>{
+        product_delete_modal.innerHTML = response
+    });
+}
+</script>
+{% endblock %}

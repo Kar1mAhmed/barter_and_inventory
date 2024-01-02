@@ -1,0 +1,112 @@
+{% extends 'barter_and_inventory/layout.html' %}
+{% load static %}
+{% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
+<div class="content container-fluid">
+    <div class="row">
+        <div class="col-sm-8">
+            <h4 class="page-title">My Profile</h4>
+        </div>
+
+        <div class="col-sm-4 text-right m-b-30">
+            <a href="{% url 'barter_and_inventory:edit_profile' %}" class="btn btn-primary rounded"><i class="fa fa-plus"></i> Edit Profile</a>
+        </div>
+    </div>
+    <div class="card-box">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="profile-view">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-1 ">
+                             <div class="profile-img-wrap" style="position: relative">
+                                <div class="profile-img">
+                                    <a href="#">
+                                        {% if object.profile.profile_picture %}
+                                            <img class="avatar" src="{{ object.profile.profile_picture.url }}" alt="user">
+                                        {% else %}
+                                            <img class="avatar" src="{% static "img/user.jpg" %}" alt="user">
+                                        {% endif %}
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-9 ">
+                            <div class="profile-basic">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="profile-info-left">
+                                            <h3 class="user-name m-t-0 m-b-0">{{ object.get_full_name }}</h3>
+                                            <small class="text-muted">@{{ object.username }}</small>
+                                            <!--<div class="staff-id">User ID : {{ object.pk }}</div>-->
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <ul class="personal-info">
+                                            <li>
+                                                <span class="title">Email:</span>
+                                                <span class="text"><a href="">{{ object.email }}</a></span>
+                                            </li>
+                                            <li>
+                                                <span class="title">Birthday:</span>
+                                                <span class="text">{{ object.profile.birth_date|date:"d/m/Y"}}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card-box m-b-0">
+                <h3 class="card-title">Bio</h3>
+                <div class="skills">
+                    {{ object.profile.bio }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card-box">
+                <h3 class="card-title">Address</h3>
+                <div class="experience-box">
+                    <ul class="experience-list">
+                        <li>
+                            <div class="experience-user">
+                                <div class="before-circle"></div>
+                            </div>
+                            <div class="experience-content">
+                                <div class="timeline-content">
+                                    <a href="#" class="name">Details:</a>
+                                    <div>{{ object.profile.location }}</div>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+
+{% endblock %}

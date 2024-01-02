@@ -1,0 +1,86 @@
+{% load static %}
+{% load barter_and_inventory_extras %}
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-inner slimscroll">
+        <div id="sidebar-menu" class="sidebar-menu">
+            <ul>
+                <li class="{% if request.resolver_match.url_name == "dashboard" %}active{% endif %}">
+                    <a href="{% url 'barter_and_inventory:dashboard' %}">Dashboard</a>
+                </li>
+                {% if perms.barter_and_inventory.view_product and perms.barter_and_inventory.add_product %}
+                    <li class="submenu {% if request.resolver_match.url_name == "add_product" or request.resolver_match.url_name == "view_products" %}active{% endif %}">
+                        <a href="#"><span> Products</span> <span class="menu-arrow"></span></a>
+                        <ul class="list-unstyled" style="display: none;">
+                            <li><a class="{% if request.resolver_match.url_name == "add_product" %}active{% endif %}" href="{% url 'barter_and_inventory:add_product' %}">Add Product</a></li>
+                            <li><a class="{% if request.resolver_match.url_name == "view_products" or request.resolver_match.url_name == "view_product_detail" %}active{% endif %}" href="{% url 'barter_and_inventory:view_products' %}">View Products</a></li>
+                        </ul>
+                    </li>
+                {% elif perms.barter_and_inventory.view_product and not perms.barter_and_inventory.add_product %}
+                    <li class="">
+                        <a class="{% if request.resolver_match.url_name == "view_products"  or request.resolver_match.url_name == "view_product_detail" %}active{% endif %}" href="{% url 'barter_and_inventory:view_products' %}">View Products</a>
+                    </li>
+                {% elif not perms.barter_and_inventory.view_product and perms.barter_and_inventory.add_product %}
+                    <li class="">
+                        <a class="{% if request.resolver_match.url_name == "add_product" %}active{% endif %}" href="{% url 'barter_and_inventory:add_product' %}">Add Product</a>
+                    </li>
+                {% endif %}
+                {% if perms.barter_and_inventory.view_offer and perms.barter_and_inventory.add_offer %}
+                    <li class="submenu {% if request.resolver_match.url_name == "add_offer" or request.resolver_match.url_name == "view_offers" or request.resolver_match.url_name == "public_offers" %}active{% endif %}">
+                        <a href="#"><span> Offers</span> <span class="menu-arrow"></span></a>
+                        <ul class="list-unstyled" style="display: none;">
+                            <li><a class="{% if request.resolver_match.url_name == "add_offer" %}active{% endif %}" href="{% url 'barter_and_inventory:add_offer' %}">Add Offer</a></li>
+                            <li><a class="{% if request.resolver_match.url_name == "view_offers" or request.resolver_match.url_name == "view_offer_detail" %}active{% endif %}" href="{% url 'barter_and_inventory:view_offers' %}">View My Offers</a></li>
+                            <li><a class="{% if request.resolver_match.url_name == "public_offers" or request.resolver_match.url_name == "view_public_offer_detail" %}active{% endif %}" href="{% url 'barter_and_inventory:public_offers' %}">View Public Offers</a></li>
+                        </ul>
+                    </li>
+                {% elif perms.barter_and_inventory.view_offer and not perms.barter_and_inventory.add_offer %}
+                    <li class="submenu {% if request.resolver_match.url_name == "add_offer" or request.resolver_match.url_name == "view_offers" or request.resolver_match.url_name == "public_offers" %}active{% endif %}">
+                        <a href="#"><span> Offers</span> <span class="menu-arrow"></span></a>
+                        <ul class="list-unstyled" style="display: none;">
+
+                            <li class="">
+                                <a class="{% if request.resolver_match.url_name == "view_offers"  or request.resolver_match.url_name == "view_offer_detail" %}active{% endif %}" href="{% url 'barter_and_inventory:view_offers' %}">View Offers</a>
+                            </li>
+                            <li><a class="{% if request.resolver_match.url_name == "public_offers" or request.resolver_match.url_name == "view_public_offer_detail" %}active{% endif %}" href="{% url 'barter_and_inventory:public_offers' %}">View Public Offers</a></li>
+                        </ul>
+                    </li>
+                {% elif not perms.barter_and_inventory.view_offer and perms.barter_and_inventory.add_offer %}
+                    <li class="submenu {% if request.resolver_match.url_name == "add_offer" or request.resolver_match.url_name == "view_offers" or request.resolver_match.url_name == "public_offers" %}active{% endif %}">
+                        <a href="#"><span> Offers</span> <span class="menu-arrow"></span></a>
+                        <ul class="list-unstyled" style="display: none;">
+                            <li class="">
+                                <a class="{% if request.resolver_match.url_name == "add_offer" %}active{% endif %}" href="{% url 'barter_and_inventory:add_offer' %}">Add Offer</a>
+                            </li>
+                            <li><a class="{% if request.resolver_match.url_name == "public_offers" or request.resolver_match.url_name == "view_public_offer_detail" %}active{% endif %}" href="{% url 'barter_and_inventory:public_offers' %}">View Public Offers</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+{#                {% for gr in user.groups.all %}#}
+{#                    {% get_models_with_permissions gr.permissions.all %}#}
+{#                    {% for key, value in models_with_permission_list.items %}#}
+{#                        {% if value|length > 1 %}#}
+{#                            <li class="submenu">#}
+{#                                <a href="#"><span> {{ key|capfirst }}</span> <span class="menu-arrow"></span></a>#}
+{#                                <ul class="list-unstyled" style="display: none;">#}
+{#                                    {% for v in value %}#}
+{#                                        {% if v|startswith:'add_' or v|startswith:'view_' %}#}
+{#                                            <li><a href="{% url 'barter_and_inventory:dashboard' %}">{{v|capfirst|replace:"_| "}}</a></li>#}
+{#                                        {% endif %}#}
+{#                                    {% endfor %}#}
+{#                                </ul>#}
+{#                            </li>#}
+{#                        {% else %}#}
+{#                            <li class="">#}
+{#                                <a href="{% url 'barter_and_inventory:dashboard' %}">{{ key|capfirst }}</a>#}
+{#                            </li>#}
+{#                        {% endif %}#}
+{##}
+{#                    {% endfor %}#}
+{#                {% endfor %}#}
+                <li>
+                    <a href="{% url 'barter_and_inventory:logout' %}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

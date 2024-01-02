@@ -1,0 +1,165 @@
+{% extends 'barter_and_inventory/layout.html' %}
+{% load static %}
+{% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap-datetimepicker.min.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="content container-fluid">
+    <div class="row">
+        <div class="col-sm-8">
+            <h4 class="page-title">Edit Profile</h4>
+        </div>
+    </div>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'barter_and_inventory:edit_profile' %}">
+        {% csrf_token %}
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        {{ error|escape }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ error|escape }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="card-box">
+            <h3 class="card-title">Basic Information</h3>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="profile-img-wrap">
+                        {% if object.profile.profile_picture %}
+                            <img class="inline-block" id="profile_avatar" src="{{ object.profile.profile_picture.url }}" alt="user">
+                        {% else %}
+                            <img class="inline-block" id="profile_avatar" src="{% static "img/user.jpg" %}" alt="user">
+                        {% endif %}
+                        <div class="fileupload btn btn-default">
+                            <span class="btn-text">edit</span>
+                            {{ form.profile_picture }}
+                        </div>
+                    </div>
+                    <div class="profile-basic">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group form-focus">
+                                    <label class="control-label">
+                                        {{ form.first_name.label }}
+                                    </label>
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group form-focus">
+                                    <label class="control-label">
+                                        {{ form.last_name.label }}
+                                    </label>
+                                     {{ form.last_name }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group form-focus">
+                                    <label class="control-label">{{ form.birth_date.label }}</label>
+                                    <div class="cal-icon">
+                                        {{ form.birth_date }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group form-focus">
+                                    <label class="control-label">{{ form.username.label }}</label>
+                                    {{ form.username }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group form-focus">
+                                    <label class="control-label">{{ form.email.label }}</label>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-box">
+            <h3 class="card-title">Bio</h3>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group form-focus">
+                        <label class="control-label">
+                            {{ form.bio.label }}
+                        </label>
+                        {{ form.bio }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-box">
+            <h3 class="card-title">Contact Information</h3>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group form-focus">
+                        <label class="control-label">
+                            {{ form.location.label }}
+                        </label>
+                        {{ form.location }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center m-t-20">
+            <button class="btn btn-primary btn-lg" type="submit">Save &amp; update</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/moment.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/bootstrap-datetimepicker.min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+    <script>
+        function readURL(files) {
+            if (files) {
+                let reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#profile_avatar')
+                        .attr('src', e.target.result)
+                        .attr('style', {'object-fit': 'cover'})
+                        .width('100%')
+                        .height(150);
+                };
+
+                reader.readAsDataURL(files[0]);
+            }
+        }
+        $(function () {
+            let dt_element = $('#id_birth_date3');
+            dt_element.datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: new Date(Date.parse("{{ object.profile.birth_date|date:"Y-m-d" }}"))
+            });
+            let f_input = $("#{{ form.profile_picture.auto_id }}");
+            f_input.on('change', function (evt){
+                console.log("f_input", f_input, f_input.prop('files'))
+                readURL(f_input.prop('files'))
+            });
+
+        });
+
+    </script>
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends 'barter_and_inventory/layout.html' %}
+{% load static %}
+{% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/image-hover.css" %}">
+{% endblock %}
+
+{% block content %}
+    <div class="content container-fluid">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+
+                {% if is_edit %}
+                    <form method="post" action="{% url 'barter_and_inventory:edit_offer' form.instance.pk %}">
+                {% else %}
+                    <form method="post" action="{% url 'barter_and_inventory:add_offer' %}">
+                {% endif %}
+                    {% csrf_token %}
+                    <h3 class="page-title">Add Offer</h3>
+                    {% if form.errors %}
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    {{ error|escape }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>{{ form.offer_title.label}} <span class="text-danger">*</span></label>
+                                {{ form.offer_title }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>{{ form.offer_description.label}}</label>
+                                {{ form.offer_description }}
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>{{ form.estimated_cost.label }}</label>
+                                {{ form.estimated_cost }}
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>{{ form.estimated_cost_currency.label }}</label>
+                                {{ form.estimated_cost_currency }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 col-md-4">
+                            <div class="form-group">
+                                 <label>{{ form.includes_cash.label }}</label>
+                                {{ form.includes_cash }}
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-md-4">
+                            <div class="form-group">
+                                 <label id="cash_in_hand_label">{{ form.cash_in_hand.label }}</label>
+                                {{ form.cash_in_hand }}
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-md-4">
+                            <div class="form-group">
+                                 <label id="cash_in_hand_currency_label">{{ form.cash_in_hand_currency.label }}</label>
+                                {{ form.cash_in_hand_currency }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>{{ form.shipment_method.label }}</label>
+                                {{ form.shipment_method }}
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>{{ form.shipment_address.label }}</label>
+                                {{ form.shipment_address }}
+                            </div>
+                        </div>
+                        {{ form.product_with_quantity.as_hidden }}
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label style="margin-bottom: 20px">Please select the products to include in offer.</label>
+                        </div>
+                        {% for product in user_available_products %}
+                            <div class="col-xs-12">
+                                <div class="card-box" id="card_box_{{ product.pk }}">
+                                    <div class="row">
+                                        <div class="col-xs-1">
+                                            <input type="checkbox" class="product_select_checkbox" value="{{ product.pk }}" id="produced_select_{{ product.pk }}" />
+                                        </div>
+                                        <div class="col-xs-7">
+                                            <p><strong>{{ product.product_title }}</strong></p>
+                                            <p><span>Available Quantity: {{ product.product_quantity }}</span></p>
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <div class="form-group form-inline" >
+                                                <label for="id_product_{{ product.pk }}">Quantity: </label>
+                                                <input id="id_product_{{ product.pk }}" data-product="{{ product.pk }}" class="form-control products_selected " style="width:60%;margin-left: 10px;" value="0" type="number" min="0" max="{{ product.product_quantity }}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center m-t-20">
+                            <button type="submit" class="btn btn-primary">
+                                {% if is_edit %}
+                                    Update Offer
+                                {% else %}
+                                    Add Offer
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="fm-modal-grid" tabindex="-1" role="dialog" aria-labelledBy="fm-modal-grid" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" id="product_delete_modal_content">
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+{% endblock %}
+
+{% block page_js_after_app %}
+<script >
+
+    $(function (){
+         $('#id_cash_in_hand').hide();
+        $('#id_cash_in_hand_currency').hide();
+        $('#cash_in_hand_label').hide();
+        $('#cash_in_hand_currency_label').hide();
+        $('#id_includes_cash').change(function (e){
+            if(this.checked){
+                console.log('checked.');
+                $('#id_cash_in_hand').show();
+                $('#cash_in_hand_label').show();
+                $('#id_cash_in_hand_currency').show();
+                $('#cash_in_hand_currency_label').show();
+            }else{
+                console.log('unchecked')
+                $('#id_cash_in_hand').hide();
+                $('#cash_in_hand_label').hide();
+                $('#id_cash_in_hand_currency').hide();
+                $('#cash_in_hand_currency_label').hide();
+            }
+        });
+        selected_products = [];
+        $(".products_selected").bind('keyup mouseup', function (e) {
+            console.log("changed", this);
+            let product_pk = $(this).data('product');
+            console.log('product_pk', product_pk);
+            let found_object_index = selected_products.findIndex(x => x.product_id === product_pk);
+            console.log("found_object_index", found_object_index);
+            if (found_object_index > -1){
+                console.log("inside found check with found_object_index", found_object_index)
+                let object_to_update = selected_products[found_object_index];
+                console.log('object_to_update', object_to_update)
+                let quantity = $('#id_product_'+product_pk).val();
+                object_to_update.quantity = parseInt(quantity)
+                if(selected_products.length > 0){
+                    $('#id_product_with_quantity').val(JSON.stringify(selected_products))
+                }
+            }
+            console.log("quantity_updated_products", selected_products)
+        });
+
+        $('.product_select_checkbox').change(function (e){
+            if(this.checked){
+                console.log('checked.', this.value);
+                let selected_product_id = this.value;
+                let quantity = $('#id_product_'+selected_product_id).val();
+                let found_object_index = selected_products.findIndex(x => x.product_id === selected_product_id);
+                if (found_object_index > -1){
+                    selected_products[found_object_index].quantity = parseInt(quantity);
+                }else{
+                    selected_products.push({'product_id': parseInt(selected_product_id), 'quantity': parseInt(quantity)})
+                }
+
+            }else{
+                console.log('unchecked');
+                let selected_product_id = this.value;
+
+                let found_object = selected_products.findIndex(x => x.product_id === parseInt(selected_product_id));
+                if (found_object > -1){
+                    selected_products.splice(found_object, 1)
+                }
+            }
+            if(selected_products.length > 0){
+                $('#id_product_with_quantity').val(JSON.stringify(selected_products))
+            }
+            console.log("quantity_updated_products", selected_products)
+        });
+    });
+
+</script>
+{% endblock %}

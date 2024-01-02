@@ -1,0 +1,17 @@
+
+<div class="modal-header">
+    <h4 class="modal-title">Delete Product</h4>
+</div>
+<div class="modal-body">
+    <form method="POST" action="{% url 'barter_and_inventory:delete_product' object.pk %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-12 col-sm-6">
+                    <p>Are you sure you want to delete "{{ object }}"?</p>
+            </div>
+        </div>
+        <div class="m-t-20 text-center">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+    </form>
+</div>

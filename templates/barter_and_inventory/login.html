@@ -1,0 +1,68 @@
+{% extends 'barter_and_inventory/account_base.html' %}
+{% load static %}
+{% block page_css_before_app %}
+
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
+<div class="account-page">
+    <div class="container">
+        <h3 class="account-title">Bart & Inventory Login</h3>
+        <div class="account-box">
+            <div class="account-wrapper">
+                <div class="account-logo">
+                    <a href="/">
+                        <img src="{% static "img/logo2.png" %}" alt="Focus Technologies">
+                    </a>
+                </div>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    {{ error|escape }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="form-group form-focus">
+                        <label class="control-label">{{ form.username.label }}</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="form-group form-focus">
+                        <label class="control-label">{{ form.password.label }}</label>
+                        {{ form.password }}
+                    </div>
+                    <div class="form-group text-center">
+                        <button class="btn btn-primary btn-block account-btn" type="submit">Login</button>
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'barter_and_inventory:reset_password' %}">Forgot your password?</a>
+                    </div>
+                    <hr>
+                    <div class="text-center">
+                        <a href="{% url 'barter_and_inventory:signup' %}">Don't have account yet? <span class="link">Signup</span></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js_before_app %}
+
+{% endblock %}
+
+{% block page_js_after_app %}
+
+{% endblock %}
