@@ -10,6 +10,7 @@
 # '''=================================================
 import os
 from unicodedata import decimal
+import random
 
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
@@ -38,6 +39,21 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class OTP(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=8)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def create_otp(self):
+        self.otp= str(random.randint(100000, 999999))
+        self.save(update_fields=['otp'])
+    
+    def verify_otp(self, entered_otp):
+        if str(entered_otp) == self.otp:
+            return True
+        return False
 
 
 class Category(models.Model):

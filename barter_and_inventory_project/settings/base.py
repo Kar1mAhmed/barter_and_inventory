@@ -13,16 +13,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'basketserviceteam@gmail.com'
+EMAIL_HOST_PASSWORD = 'pvwwmvluuvsvjiwc'
 EMAIL_PORT = 587
-# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '2tfhh$V&8')
-EMAIL_HOST_USER = 'swapehxyz@gmail.com'
-# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '2tfhh$V&8')
-EMAIL_HOST_PASSWORD = 'Xh9n6!H%*'
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
