@@ -162,7 +162,7 @@ class SignupView(FormView):
         subject = 'Activate Your Bart & Inventory Account'
         message = render_to_string('barter_and_inventory/account_activation_email.html', {
             'user': created_user,
-            'domain': current_site.domain,
+            'domain': current_site,
             'uid': urlsafe_base64_encode(force_bytes(created_user.pk)),
             'token': account_activation_token.make_token(created_user),
         })
