@@ -17,12 +17,20 @@ from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.utils import timezone
 
-from barter_and_inventory.models import Product, Offer, OfferBid
+from barter_and_inventory.models import Product, Offer, OfferBid, OTP
 
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control floating'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control floating'}))
+    
+
+class OTPForm(forms.ModelForm):
+    otp = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control floating'}))
+
+    class Meta:
+        model = OTP  
+        fields = ['otp']
 
 
 class ResetPasswordForm(SetPasswordForm):

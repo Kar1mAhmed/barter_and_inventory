@@ -17,8 +17,10 @@ from django.conf import settings
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
-    path('login', views.BarterLoginView.as_view(redirect_authenticated_user=True), name='login'),
+    path('login', views.BarterLoginView.as_view(), name='login'),
     path('signup', views.SignupView.as_view(), name='signup'),
+    path('otp-verification/<int:user_id>/', views.OTPVerificationView.as_view(), name='otp_verification'),
+    path('otp-resend/<int:user_id>/', views.resend_otp, name='otp_resend'),
     path('logout', views.LogoutView.as_view(), name="logout"),
     path('dashboard', views.DashboardView.as_view(), name="dashboard"),
     path('account_activation_sent', views.AccountActivationSentView.as_view(), name="account_activation_sent"),

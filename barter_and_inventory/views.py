@@ -12,6 +12,8 @@ import datetime
 import json
 
 from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -32,9 +34,9 @@ from django.views import View
 from django.views.generic import TemplateView, FormView, RedirectView, UpdateView, ListView, DeleteView, DetailView
 
 from barter_and_inventory.forms import LoginForm, SignupForm, ResetPasswordForm, PasswordResetRequestForm, AddProductForm, ProfileUpdateForm, \
-    ChangePasswordForm, AddOfferForm, PlaceBidForm, AcceptBidForm
+    ChangePasswordForm, AddOfferForm, PlaceBidForm, AcceptBidForm, OTPForm
 from barter_and_inventory.mixins import FrontendUserViewMixin
-from barter_and_inventory.models import Product, ProductPicture, Offer, OfferProduct, OfferBid, Category
+from barter_and_inventory.models import Product, ProductPicture, Offer, OfferProduct, OfferBid, Category, OTP
 from barter_and_inventory.tokens import account_activation_token
 from barter_and_inventory.utils import items_this_years
 
@@ -43,23 +45,66 @@ class BarterLoginView(LoginView):
     template_name = 'barter_and_inventory/login.html'
     authentication_form = LoginForm
     redirect_field_name = 'redirects_to'
-
+    user = None
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
 
     def get_success_url(self):
-        return reverse_lazy('barter_and_inventory:dashboard')
-
+            return reverse_lazy('barter_and_inventory:otp_verification', kwargs={'user_id': self.user.id})
+        
     def form_valid(self, form):
-        user = form.get_user()
-        person = User.objects.get(username=user)
+        self.user = form.get_user()
+        person = User.objects.get(username=self.user)
         if person.groups.filter(name='frontend_user').exists():
-            auth_login(self.request, form.get_user())
+            otp = OTP.objects.get_or_create(user=self.user)
+            otp[0].create_otp()
             return HttpResponseRedirect(self.get_success_url())
         else:
             form.add_error(None, ValidationError("You're not authorized to login to this console"))
             return super(BarterLoginView, self).form_invalid(form=form)
+
+
+
+class OTPVerificationView(View):
+    template_name = 'barter_and_inventory/otp_verification.html'
+
+    def get(self, request, user_id):
+        user = User.objects.get(id=user_id)
+        form = OTPForm()
+        context = {'form': form, 'user_id': user.id}
+        return render(request, self.template_name, context)
+
+    def post(self, request, user_id):
+        user = User.objects.get(id=user_id)
+        otp_form = OTPForm(request.POST)
+
+        if otp_form.is_valid():
+            entered_otp = otp_form.cleaned_data['otp']
+
+            try:
+                otp_object = OTP.objects.get(user=user)
+            except OTP.DoesNotExist:
+                otp_form.add_error(None, ValidationError("OTP didn't sent"))
+                return render(request, self.template_name, {'form': otp_form, 'user_id': user.id})
+
+            if otp_object.verify_otp(entered_otp):
+                auth_login(request, user)
+                return redirect('barter_and_inventory:dashboard')
+            else:
+                otp_form.add_error(None, ValidationError("Wrong OTP"))
+                return render(request, self.template_name, {'form': otp_form, 'user_id': user.id})
+        else:
+            for field, errors in otp_form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+                return render(request, self.template_name, {'form': otp_form, 'user_id': user.id})
+
+def resend_otp(request, user_id):
+    user = User.objects.get(id=user_id)
+    otp = OTP.objects.get(user=user)
+    otp.create_otp()
+    return redirect('barter_and_inventory:otp_verification', user_id=user.id)    
 
 
 class LogoutView(RedirectView):

@@ -13,7 +13,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from barter_and_inventory.models import Profile, Product, Offer, Category, OfferProduct, ProductPicture, OfferBid
+from barter_and_inventory.models import Profile, Product, Offer, Category, OfferProduct, ProductPicture, OfferBid, OTP
 
 
 class UserCustomAdmin(UserAdmin):
@@ -27,6 +27,7 @@ class UserCustomAdmin(UserAdmin):
 
 
 admin.site.unregister(User)
+admin.site.register(OTP)
 admin.site.register(User, UserCustomAdmin)
 admin.site.register(Profile)
 admin.site.register(Product)

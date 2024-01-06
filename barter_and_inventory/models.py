@@ -11,6 +11,7 @@
 import os
 from unicodedata import decimal
 import random
+from django.core.mail import send_mail
 
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
@@ -18,6 +19,8 @@ from django.db import models
 
 from barter_and_inventory.utils import user_profile_picture_upload_handler, initials_color_code_generator, product_photo_upload_handler
 from barter_and_inventory.validators import validate_image_size
+from barter_and_inventory_project.settings.base import EMAIL_HOST_USER
+
 
 
 class Profile(models.Model):
@@ -49,11 +52,18 @@ class OTP(models.Model):
     def create_otp(self):
         self.otp= str(random.randint(100000, 999999))
         self.save(update_fields=['otp'])
+        self.send_otp()
     
     def verify_otp(self, entered_otp):
         if str(entered_otp) == self.otp:
             return True
         return False
+    
+    def send_otp(self):
+        subject = 'Verify login'
+        message = f'Please use this OTP in you login:\n {self.otp}'
+        send_mail(subject, message, EMAIL_HOST_USER, [self.user.email])
+
 
 
 class Category(models.Model):

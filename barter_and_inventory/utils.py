@@ -11,16 +11,8 @@
 import datetime
 import random
 
-from django.core.mail import send_mail
-from barter_and_inventory_project.settings.base import EMAIL_HOST_USER
 
 
-
-
-def send_otp(user_email):
-    subject = 'Verify login'
-    message = 'Please use this OTP in you login:\n 040493'
-    send_mail(subject, message, EMAIL_HOST_USER, [user_email])
 
 
 def user_profile_picture_upload_handler(instance, filename):
