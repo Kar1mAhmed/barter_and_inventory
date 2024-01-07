@@ -102,10 +102,10 @@
                                             <p>You've already placed a bid.</p>
                                             <a href="{% url 'barter_and_inventory:view_offer_detail' offer.already_placed_bid %}" class="btn btn-info btn-block">View Your Bid</a>
                                         {% else %}
-                                            <button onclick="paceBidOnOffer('{% url 'barter_and_inventory:view_exchangeable_offers' offer.pk %}')" class="btn btn-success btn-block">Place Bid</button>
+                                        <button onclick="paceBidOnOffer(this)" data-base-url="{% url 'barter_and_inventory:view_exchangeable_offers' offer.pk %}" class="btn btn-success btn-block">Place Bid</button>
                                         {% endif %}
                                     {% else %}
-                                    <button onclick="paceBidOnOffer(this)" data-base-url="{% url 'barter_and_inventory:view_exchangeable_offers' offer.pk %}" class="btn btn-success btn-block">Place Bid</button>
+                                        <a href="{% url 'barter_and_inventory:login' %}" class="btn btn-success btn-block">Place Bid</a>
                                     {% endif %}
                                 </div>
                                 <div class="col-xs-12" style="padding-top: 10px; padding-bottom: 10px;">
