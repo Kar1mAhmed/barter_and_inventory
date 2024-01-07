@@ -105,7 +105,7 @@
                                             <button onclick="paceBidOnOffer('{% url 'barter_and_inventory:view_exchangeable_offers' offer.pk %}')" class="btn btn-success btn-block">Place Bid</button>
                                         {% endif %}
                                     {% else %}
-                                        <a href="{% url 'barter_and_inventory:login' %}" class="btn btn-success btn-block">Place Bid</a>
+                                    <button onclick="paceBidOnOffer(this)" data-base-url="{% url 'barter_and_inventory:view_exchangeable_offers' offer.pk %}" class="btn btn-success btn-block">Place Bid</button>
                                     {% endif %}
                                 </div>
                                 <div class="col-xs-12" style="padding-top: 10px; padding-bottom: 10px;">
@@ -309,14 +309,17 @@ $(function (){
         $("#category_filter_select").val("{{ category }}").trigger('change')
     {% endif %}
 });
-function paceBidOnOffer(url){
-    let uri = "{{ request.scheme }}://{{ request.META.HTTP_HOST }}"+url;
+function paceBidOnOffer(button){
+    let baseUrl = button.getAttribute('data-base-url');
+    let uri = baseUrl;
+    // rest of the function remains the same
     $("#fm-modal-grid").modal("show");
     let product_delete_modal = document.getElementById('offer_delete_modal_content');
     $.get(uri, (response)=>{
         product_delete_modal.innerHTML = response
     });
 }
+
 function selectProductToBid(id){
     $("div[id^='offer_card_']").css('background', '#fff');
     let offer_card = $('#offer_card_'+id);
