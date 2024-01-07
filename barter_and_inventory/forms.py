@@ -136,8 +136,7 @@ class ProfileUpdateForm(forms.ModelForm):
 
 
 class AddOfferForm(forms.ModelForm):
-    product_with_quantity = forms.JSONField(required=True)
-
+    product_with_quantity = forms.JSONField(required=True, error_messages={'required': 'You should select one of you products and define the quantity'})
     class Meta:
         model = Offer
         fields = (
