@@ -51,7 +51,7 @@ class BarterLoginView(LoginView):
         return context
 
     def get_success_url(self):
-            return reverse_lazy('barter_and_inventory:otp_verification', kwargs={'user_id': self.user.id})
+            return reverse_lazy('barter_and_inventory:otp_verification', kwargs={'email': self.user.email})
         
     def form_valid(self, form):
         self.user = form.get_user()
@@ -101,7 +101,7 @@ class OTPVerificationView(View):
                 return render(request, self.template_name, {'form': otp_form, 'email': email})
 
 def resend_otp(request, email):
-    user = User.objects.get(id=email)
+    user = User.objects.get(email=email)
     otp = OTP.objects.get(user=user)
     otp.create_otp()
     return redirect('barter_and_inventory:otp_verification', email=email)    
