@@ -69,14 +69,14 @@ class BarterLoginView(LoginView):
 class OTPVerificationView(View):
     template_name = 'barter_and_inventory/otp_verification.html'
 
-    def get(self, request, user_id):
-        user = User.objects.get(id=user_id)
+    def get(self, request, email):
+        user = User.objects.get(email=email)
         form = OTPForm()
-        context = {'form': form, 'user_id': user.id}
+        context = {'form': form, 'email': email}
         return render(request, self.template_name, context)
 
-    def post(self, request, user_id):
-        user = User.objects.get(id=user_id)
+    def post(self, request, email):
+        user = User.objects.get(email=email)
         otp_form = OTPForm(request.POST)
 
         if otp_form.is_valid():
@@ -86,25 +86,25 @@ class OTPVerificationView(View):
                 otp_object = OTP.objects.get(user=user)
             except OTP.DoesNotExist:
                 otp_form.add_error(None, ValidationError("OTP didn't sent"))
-                return render(request, self.template_name, {'form': otp_form, 'user_id': user.id})
+                return render(request, self.template_name, {'form': otp_form, 'email': email})
 
             if otp_object.verify_otp(entered_otp):
                 auth_login(request, user)
                 return redirect('barter_and_inventory:dashboard')
             else:
                 otp_form.add_error(None, ValidationError("Wrong OTP"))
-                return render(request, self.template_name, {'form': otp_form, 'user_id': user.id})
+                return render(request, self.template_name, {'form': otp_form, 'email': email})
         else:
             for field, errors in otp_form.errors.items():
                 for error in errors:
                     messages.error(request, f'{field}: {error}')
-                return render(request, self.template_name, {'form': otp_form, 'user_id': user.id})
+                return render(request, self.template_name, {'form': otp_form, 'email': email})
 
-def resend_otp(request, user_id):
-    user = User.objects.get(id=user_id)
+def resend_otp(request, email):
+    user = User.objects.get(id=email)
     otp = OTP.objects.get(user=user)
     otp.create_otp()
-    return redirect('barter_and_inventory:otp_verification', user_id=user.id)    
+    return redirect('barter_and_inventory:otp_verification', email=email)    
 
 
 class LogoutView(RedirectView):
