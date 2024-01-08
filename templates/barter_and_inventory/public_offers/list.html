@@ -312,7 +312,6 @@ $(function (){
 function paceBidOnOffer(button){
     let baseUrl = button.getAttribute('data-base-url');
     let uri = baseUrl;
-    // rest of the function remains the same
     $("#fm-modal-grid").modal("show");
     let product_delete_modal = document.getElementById('offer_delete_modal_content');
     $.get(uri, (response)=>{
