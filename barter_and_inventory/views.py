@@ -158,11 +158,11 @@ class SignupView(FormView):
         created_user.refresh_from_db()
         created_user.profile.birth_date = form.cleaned_data['birth_date']
         created_user.save()
-        current_site = self.request.get_host()
+        current_site = get_current_site(self.request)
         subject = 'Activate Your Bart & Inventory Account'
         message = render_to_string('barter_and_inventory/account_activation_email.html', {
             'user': created_user,
-            'domain': current_site,
+            'domain': current_site.domain,
             'uid': urlsafe_base64_encode(force_bytes(created_user.pk)),
             'token': account_activation_token.make_token(created_user),
         })
