@@ -505,6 +505,11 @@ class ExchangeableOffersListView(FrontendUserViewMixin, PermissionRequiredMixin,
         offer = form.cleaned_data['bid_offer']
         form.save(commit=True)
         return HttpResponseRedirect(reverse_lazy('barter_and_inventory:view_offer_detail', kwargs={'pk': offer.pk}))
+    
+    def form_invalid(self, form):
+        # Handle form validation errors here
+        context = self.get_context_data(form=form)
+        return render(self.request, self.template_name, context)
 
 
 class AddOfferView(FrontendUserViewMixin, PermissionRequiredMixin, FormView):

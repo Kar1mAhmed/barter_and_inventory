@@ -1,4 +1,16 @@
+{% extends 'barter_and_inventory/layout.html' %}
+{% load static %}
 {% load barter_and_inventory_extras %}
+{% block page_css_before_app %}
+	<link rel="stylesheet" type="text/css" href="{% static "css/dataTables.bootstrap.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/select2.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap-datetimepicker.min.css" %}">
+{% endblock %}
+{% block page_css_after_app %}
+
+{% endblock %}
+
+{% block content %}
 <div class="modal-header">
     <h4 class="modal-title">Select Your Offer</h4>
 </div>
@@ -140,6 +152,16 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block page_js_before_app %}
+    <script type="text/javascript" src="{% static "js/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/dataTables.bootstrap.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery.slimscroll.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/moment.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/bootstrap-datetimepicker.min.js" %}"></script>
+{% endblock %}
 
 {% block page_js_after_app %}
 <script>
@@ -150,5 +172,6 @@ function selectProductToBid(id){
     offer_card.css({background: 'linear-gradient(to right, #ff9b44 0%, #fc6075 100%)'});
     $('#id_offer').val(id);
 }
+
 </script>
 {% endblock %}

@@ -152,11 +152,10 @@ class AddOfferForm(forms.ModelForm):
 
 
 class PlaceBidForm(forms.ModelForm):
-
     class Meta:
         model = OfferBid
         fields = ('offer', 'bid_offer',)
-
+        
 
 class AcceptBidForm(forms.ModelForm):
     offer = forms.IntegerField(required=True)
