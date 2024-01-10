@@ -11,9 +11,9 @@
 import os
 from .utils import get_secret
 from .base import *
-if get_secret('PROJECT_ENVIRONMENT') == 'prod':
-    print('using prod settings')
-    from .prod import *
-else:
-    print('using dev settings')
-    from .dev import *
+# if get_secret('PROJECT_ENVIRONMENT') == 'prod':
+#     print('using prod settings')
+#     from .prod import *
+# else:
+#     print('using dev settings')
+from .dev import *
