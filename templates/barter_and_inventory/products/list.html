@@ -138,7 +138,7 @@
                                             <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
                                             <ul class="dropdown-menu pull-right">
                                                 <li><a href="{% url 'barter_and_inventory:edit_product' product.pk %}" title="Edit" ><i class="fa fa-pencil m-r-5"></i> Edit</a></li>
-                                                <li><a onclick="javascript:deleteProduct('{% url 'barter_and_inventory:delete_product' product.pk %}')" title="Delete" ><i class="fa fa-trash-o m-r-5"></i> Delete</a></li>
+                                                <li><a href="{% url 'barter_and_inventory:delete_product' product.pk %}" title="Delete" ><i class="fa fa-trash-o m-r-5"></i> Delete</a></li>
                                             </ul>
                                         </div>
                                     </td>
