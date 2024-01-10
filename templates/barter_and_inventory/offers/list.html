@@ -145,7 +145,7 @@
                                     </td>
                                     <td class="text-right">
                                         {% if offer.offer_status == "OPEN" or offer.offer_status == "NEGOTIATION" %}
-                                        <a onclick="javascript:deleteOffer('{% url 'barter_and_inventory:delete_offer' offer.pk %}')" title="Delete" class="btn btn-danger"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
+                                        <a onclick="{% url 'barter_and_inventory:delete_offer' offer.pk %}" title="Delete" class="btn btn-danger"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
                                         {% else %}
                                             N/A
                                         {% endif %}
