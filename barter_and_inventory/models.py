@@ -119,7 +119,7 @@ class Product(models.Model):
     product_quantity = models.IntegerField(default=1)
     product_condition = models.CharField(max_length=10, choices=ProductCondition.choices, default=ProductCondition.NEW)
     price_per_unit = models.DecimalField(max_digits=7, decimal_places=2, default=0.00)
-    price_currency = models.CharField(max_length=255, choices=ProductPriceCurrency.choices, default=ProductPriceCurrency.USD)
+    price_currency = models.CharField(max_length=255, choices=ProductPriceCurrency.choices, default=ProductPriceCurrency.CAD)
     product_status = models.CharField(max_length=255, choices=ProductStatus.choices, default=ProductStatus.AVAILABLE)
     product_categories = models.ManyToManyField(Category, related_name='categories')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='product_created_by')
@@ -199,7 +199,7 @@ class Offer(models.Model):
     includes_cash = models.BooleanField(default=False)
     cash_in_hand = models.DecimalField(max_digits=10, null=True, blank=True, decimal_places=2)
     cash_in_hand_currency = models.CharField(max_length=255, null=True, blank=True, choices=EstimatedCostCurrency.choices,
-                                             default=EstimatedCostCurrency.USD)
+                                             default=EstimatedCostCurrency.CAD)
     exchanged_with = models.ForeignKey('self', on_delete=models.RESTRICT, null=True, blank=True, related_name='exchanged_with_offer')
     exchange_date = models.DateTimeField(null=True, blank=True)
     shipment_method = models.CharField(max_length=255, null=True, blank=True, choices=ShipmentMethod.choices, default=ShipmentMethod.SELF_PICKUP)

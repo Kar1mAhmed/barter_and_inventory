@@ -86,7 +86,15 @@ class SignupForm(UserCreationForm):
 class AddProductForm(forms.ModelForm):
     product_photos = forms.FileField(validators=[FileExtensionValidator(allowed_extensions=['png', 'jpeg', 'jpg'])],
                                      widget=forms.ClearableFileInput(attrs={'multiple': True}))
-
+    product_condition =  forms.ChoiceField(
+        choices=[("NEW", "New"), ("USED", "Used"), (None, '----')],
+        initial=None,
+        required=True,
+        error_messages={
+            'required': 'Please select a product condition.'
+        }
+    )
+    
     class Meta:
         model = Product
         fields = (
@@ -100,6 +108,8 @@ class AddProductForm(forms.ModelForm):
             self.fields[field].widget.attrs['class'] = 'form-control'
         self.fields['product_condition'].widget.attrs.update({'class': 'form-control select'})
         self.fields['price_currency'].widget.attrs.update({'class': 'form-control select'})
+        
+        self.fields['price_currency'].initial = 'CAD'
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -149,6 +159,9 @@ class AddOfferForm(forms.ModelForm):
         super(AddOfferForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
+            
+            self.fields['estimated_cost_currency'].initial = 'CAD'
+
 
 
 class PlaceBidForm(forms.ModelForm):

@@ -600,7 +600,7 @@ class EditOfferView(FrontendUserViewMixin, PermissionRequiredMixin, UpdateView):
 class PublicOffersListView(ListView):
     template_name = 'barter_and_inventory/public_offers/list.html'
     queryset = Offer.objects.filter(offer_status__in=[Offer.OfferStatus.OPEN, Offer.OfferStatus.NEGOTIATION])
-    paginate_by = 1
+    paginate_by = 10
     context_object_name = 'offers'
 
     def get_queryset(self):
