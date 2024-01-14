@@ -85,7 +85,7 @@ class SignupForm(UserCreationForm):
 
 class AddProductForm(forms.ModelForm):
     product_photos = forms.FileField(validators=[FileExtensionValidator(allowed_extensions=['png', 'jpeg', 'jpg'])],
-                                     widget=forms.ClearableFileInput(attrs={'multiple': True}))
+                                    widget=forms.ClearableFileInput(attrs={'multiple': True}))
     product_condition =  forms.ChoiceField(
         choices=[("NEW", "New"), ("USED", "Used"), (None, '----')],
         initial=None,

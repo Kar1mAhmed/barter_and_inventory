@@ -84,6 +84,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+FILE_UPLOAD_MAX_MEMORY_SIZE = 9 * 1024 * 1024
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",  # or the origin of your frontend
 ]
@@ -97,7 +99,7 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
+ 
 SITE_ID = 1 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
